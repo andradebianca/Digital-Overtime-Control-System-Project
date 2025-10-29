@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define MAX_HORAS_EXTRAS 176
 
+// Declaração de Função
 
 
 
 int main()
 {
-    int resposta, respostagestor;
-    
+    int resposta, respostagestor, entradafuncionario, saidafuncionario;
     
     do {
     printf("<===== REGISTRO DE HORAS EXTRAS ====>\n");
@@ -25,16 +26,18 @@ int main()
     switch (resposta)
     {
         case 1:
-        system("cls");
+        	system("cls");
             do {
                 printf("=== GESTOR === \n");
                 printf("Liberar hora extra diaria?\n(1) Sim    (2) Nao\n-> ");
                 scanf("%d", &respostagestor);
         
                 if (respostagestor == 1)
-                {
-                    printf("Horas extras liberadas!\n");
-                    system("sleep 1");
+                {	
+                	
+
+                    
+                    
                 }   
                 
                 else if (respostagestor == 2)
@@ -51,7 +54,6 @@ int main()
         
                 system("cls");
             } while (respostagestor != 1 && respostagestor != 2);
-    
 
 
         break;
@@ -60,6 +62,7 @@ int main()
         break;
         
         case 3:
+
         break; 
         
         case 4:
@@ -67,6 +70,9 @@ int main()
             exit(EXIT_SUCCESS);
         break;
     }
+    
+
+    
 
     return 0;
 }
