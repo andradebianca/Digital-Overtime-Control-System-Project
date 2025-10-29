@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX_HORAS_EXTRAS 176
 
-// Declaração de Função
 
 
 
