@@ -1,76 +1,196 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <string.h>
 
+// Função para calcular horas extras
+int acumularhorasfuncao(int a, int b) {
+    int horasextrascalculo;
+    horasextrascalculo = abs(a - b);
+    if (horasextrascalculo > 8)
+        horasextrascalculo -= 8;  
+    else
+        horasextrascalculo = 0;
+    return horasextrascalculo;
+}
 
+// Função para registrar horas (ou negação)
+void registrarHoras(int entrada, int saida, int horasextras, int negado) {
+    FILE *arquivo;
+    time_t agora;
+    struct tm *infoTempo;
 
+    time(&agora);
+    infoTempo = localtime(&agora);
 
-int main()
-{
-    int resposta, respostagestor, entradafuncionario, saidafuncionario;
-    
+    arquivo = fopen("relatorio_horas.txt", "a");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+        return;
+    }
+
+    fprintf(arquivo, "-------------------------------------\n");
+    fprintf(arquivo, "Data: %02d/%02d/%04d\n", 
+            infoTempo->tm_mday, infoTempo->tm_mon + 1, infoTempo->tm_year + 1900);
+    fprintf(arquivo, "Hora do registro: %02d:%02d:%02d\n", 
+            infoTempo->tm_hour, infoTempo->tm_min, infoTempo->tm_sec);
+
+    if (negado) {
+        fprintf(arquivo, "Status: Hora extra NEGADA pelo gestor.\n");
+        fprintf(arquivo, "Entrada: -- | Saida: -- | Horas Extras: 0h\n");
+    } else {
+        fprintf(arquivo, "Status: Hora extra APROVADA.\n");
+        fprintf(arquivo, "Entrada: %dh | Saida: %dh | Horas Extras: %dh\n", 
+                entrada, saida, horasextras);
+    }
+
+    fprintf(arquivo, "-------------------------------------\n\n");
+    fclose(arquivo);
+}
+
+// Contar registros (tanto aprovados quanto negados)
+int contarRegistros() {
+    FILE *arquivo;
+    char linha[200];
+    int contador = 0;
+
+    arquivo = fopen("relatorio_horas.txt", "r");
+    if (arquivo == NULL)
+        return 0;
+
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        if (strstr(linha, "Status:"))  // Conta ambos os tipos de registros
+            contador++;
+    }
+
+    fclose(arquivo);
+    return contador;
+}
+
+// Somar apenas horas extras aprovadas
+int somarHorasExtras() {
+    FILE *arquivo;
+    char linha[200];
+    int total = 0, horas;
+    arquivo = fopen("relatorio_horas.txt", "r");
+    if (arquivo == NULL)
+        return 0;
+
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        if (sscanf(linha, "Entrada: %*dh | Saida: %*dh | Horas Extras: %dh", &horas) == 1)
+            total += horas;
+    }
+
+    fclose(arquivo);
+    return total;
+}
+
+// Visualizar relatório completo
+void visualizarRelatorio() {
+    FILE *arquivo;
+    char linha[200];
+    int totalHoras = somarHorasExtras();
+    int qtdRegistros = contarRegistros();
+
+    arquivo = fopen("relatorio_horas.txt", "r");
+    if (arquivo == NULL) {
+        printf("Nenhum registro encontrado.\n");
+        return;
+    }
+
+    printf("\n===== RELATORIO DE HORAS EXTRAS =====\n\n");
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        printf("%s", linha);
+    }
+    fclose(arquivo);
+
+    printf("Total de registros (aprovados e negados): %d\n", qtdRegistros);
+    printf("Total de horas extras acumuladas: %dh\n", totalHoras);
+    printf("\n=====================================\n");
+
+    if (qtdRegistros >= 2) {
+        printf("\n>>> LIMITE DE 2 REGISTROS ALCANCADO <<<\n");
+        printf("Total final de horas extras: %dh\n", totalHoras);
+        printf("Limpando o relatorio...\n");
+
+        arquivo = fopen("relatorio_horas.txt", "w"); 
+        fclose(arquivo);
+
+        printf("Relatorio limpo com sucesso!\n");
+    }
+}
+
+int main() {
+    int resposta, respostagestor, entradafuncionario, saidafuncionario, acumulohorasextras;
+
     do {
-    printf("<===== REGISTRO DE HORAS EXTRAS ====>\n");
-    printf("(1) Solicitar hora extra\n(2) Relatorio\n(3) Controle de Horas\n(4) Sair\n-> ");
-    scanf("%d", &resposta);
-    if (resposta != 1 && resposta != 2 && resposta != 3 && resposta != 4)
-    {
-        printf("Opcao invalida! Tente novamente.\n");
-        system("sleep 1");
         system("cls");
-    }
-    
-    } while (resposta != 1 && resposta != 2 && resposta != 3 && resposta != 4);
-    
-    switch (resposta)
-    {
-        case 1:
-        	system("cls");
-            do {
-                printf("=== GESTOR === \n");
-                printf("Liberar hora extra diaria?\n(1) Sim    (2) Nao\n-> ");
-                scanf("%d", &respostagestor);
-        
-                if (respostagestor == 1)
-                {	
-                	
+        printf("<===== REGISTRO DE HORAS EXTRAS ====>\n");
+        printf("(1) Solicitar hora extra\n(2) Relatorio\n(3) Controle de Horas\n(4) Sair\n-> ");
+        scanf("%d", &resposta);
 
-                    
-                    
-                }   
-                
-                else if (respostagestor == 2)
-                {
-                    printf("Horas extras negadas!\n");
-                    system("sleep 1");
-                }
-                
-                else
-                {
-                    printf("Opcao invalida! Tente novamente.\n");
-                    system("sleep 1");
-                }
-        
+        switch (resposta) {
+            case 1:
                 system("cls");
-            } while (respostagestor != 1 && respostagestor != 2);
+                do {
+                    printf("=== GESTOR === \n");
+                    printf("Liberar hora extra diaria?\n(1) Sim    (2) Nao\n-> ");
+                    scanf("%d", &respostagestor);
 
+                    if (respostagestor == 1) {
+                        system("cls");
+                        printf("Horario de Entrada (somente hora inteira): ");
+                        scanf("%d", &entradafuncionario);
+                        printf("Horario de Saida (somente hora inteira): ");
+                        scanf("%d", &saidafuncionario);
 
-        break;
-        
-        case 2:
-        break;
-        
-        case 3:
+                        acumulohorasextras = acumularhorasfuncao(entradafuncionario, saidafuncionario);
 
-        break; 
-        
-        case 4:
-            printf("Programa finalizado.");
-            exit(EXIT_SUCCESS);
-        break;
-    }
-    
+                        printf("\nHoras extras registradas: %dh\n", acumulohorasextras);
 
-    
+                        registrarHoras(entradafuncionario, saidafuncionario, acumulohorasextras, 0);
+
+                        printf("Registro salvo com sucesso no arquivo relatorio_horas.txt!\n\n");
+                        system("pause");
+                    } 
+                    else if (respostagestor == 2) {
+                        printf("Horas extras negadas!\n");
+                        registrarHoras(0, 0, 0, 1);  // registra o pedido negado
+                        system("pause");
+                    } 
+                    else {
+                        printf("Opcao invalida! Tente novamente.\n");
+                        system("pause");
+                    }
+
+                    system("cls");
+                } while (respostagestor != 1 && respostagestor != 2);
+                break;
+
+            case 2:
+                system("cls");
+                visualizarRelatorio();
+                system("pause");
+                break;
+
+            case 3:
+                system("cls");
+                printf("Funcionalidade de controle ainda em desenvolvimento.\n");
+                system("pause");
+                break;
+
+            case 4:
+                printf("Programa finalizado.\n");
+                exit(EXIT_SUCCESS);
+                break;
+
+            default:
+                printf("Opcao invalida! Tente novamente.\n");
+                system("pause");
+                break;
+        }
+
+    } while (resposta != 4);
 
     return 0;
 }
