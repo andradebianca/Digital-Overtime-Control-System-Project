@@ -1,20 +1,30 @@
+//_____BIBLIOTECAS______<
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+//______________________
 
-// Função para calcular horas extras
-int acumularhorasfuncao(int a, int b) {
+
+//______CABEÇALHO DE FUNÇÕES________<
+
+// Calcular horas extras.
+int acumularhorasfuncao(int a, int b) 
+{
     int horasextrascalculo;
     horasextrascalculo = abs(a - b);
-    if (horasextrascalculo > 8)
-        horasextrascalculo -= 8;  
-    else
+    
+    if (horasextrascalculo > 8) {
+    horasextrascalculo -= 8;
+	}
+    else {
         horasextrascalculo = 0;
+	}
+	
     return horasextrascalculo;
 }
 
-// Função para registrar horas (ou negação)
+// Registrar horas.
 void registrarHoras(int entrada, int saida, int horasextras, int negado) {
     FILE *arquivo;
     time_t agora;
@@ -25,30 +35,27 @@ void registrarHoras(int entrada, int saida, int horasextras, int negado) {
 
     arquivo = fopen("relatorio_horas.txt", "a");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
         return;
     }
 
     fprintf(arquivo, "-------------------------------------\n");
-    fprintf(arquivo, "Data: %02d/%02d/%04d\n", 
-            infoTempo->tm_mday, infoTempo->tm_mon + 1, infoTempo->tm_year + 1900);
-    fprintf(arquivo, "Hora do registro: %02d:%02d:%02d\n", 
-            infoTempo->tm_hour, infoTempo->tm_min, infoTempo->tm_sec);
+    fprintf(arquivo, "Data: %02d/%02d/%04d\n", infoTempo->tm_mday, infoTempo->tm_mon + 1, infoTempo->tm_year + 1900);
+    fprintf(arquivo, "Hora do registro: %02d:%02d:%02d\n", infoTempo->tm_hour, infoTempo->tm_min, infoTempo->tm_sec);
 
     if (negado) {
         fprintf(arquivo, "Status: Hora extra NEGADA pelo gestor.\n");
         fprintf(arquivo, "Entrada: -- | Saida: -- | Horas Extras: 0h\n");
-    } else {
+    } 
+	else {
         fprintf(arquivo, "Status: Hora extra APROVADA.\n");
-        fprintf(arquivo, "Entrada: %dh | Saida: %dh | Horas Extras: %dh\n", 
-                entrada, saida, horasextras);
+        fprintf(arquivo, "Entrada: %dh | Saida: %dh | Horas Extras: %dh\n", entrada, saida, horasextras);
     }
 
     fprintf(arquivo, "-------------------------------------\n\n");
     fclose(arquivo);
 }
 
-// Contar registros (tanto aprovados quanto negados)
+// Contar registros aprovados e negados.
 int contarRegistros() {
     FILE *arquivo;
     char linha[200];
@@ -59,7 +66,7 @@ int contarRegistros() {
         return 0;
 
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        if (strstr(linha, "Status:"))  // Conta ambos os tipos de registros
+        if (strstr(linha, "Status:"))
             contador++;
     }
 
@@ -67,7 +74,7 @@ int contarRegistros() {
     return contador;
 }
 
-// Somar apenas horas extras aprovadas
+// Somar apenas horas extras aprovadas.
 int somarHorasExtras() {
     FILE *arquivo;
     char linha[200];
@@ -85,19 +92,23 @@ int somarHorasExtras() {
     return total;
 }
 
-// Visualizar relatório completo
+// Exibir relatório completo
 void visualizarRelatorio() {
     FILE *arquivo;
     char linha[200];
     int totalHoras = somarHorasExtras();
     int qtdRegistros = contarRegistros();
+    int opcaoRelatorio;
 
     arquivo = fopen("relatorio_horas.txt", "r");
     if (arquivo == NULL) {
-        printf("Nenhum registro encontrado.\n");
+        printf("\nNenhum registro encontrado.\n");
+        system("pause");
         return;
     }
 
+    // Exibir conteúdo do relatório
+    system("cls");
     printf("\n===== RELATORIO DE HORAS EXTRAS =====\n\n");
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
         printf("%s", linha);
@@ -108,17 +119,22 @@ void visualizarRelatorio() {
     printf("Total de horas extras acumuladas: %dh\n", totalHoras);
     printf("\n=====================================\n");
 
-    if (qtdRegistros >= 2) {
-        printf("\n>>> LIMITE DE 2 REGISTROS ALCANCADO <<<\n");
-        printf("Total final de horas extras: %dh\n", totalHoras);
-        printf("Limpando o relatorio...\n");
+    // Menu interno do relatório
+    printf("\n(1) Voltar ao menu principal\n(2) Fechar relatorio\n-> ");
+    scanf("%d", &opcaoRelatorio);
+
+    if (opcaoRelatorio == 2) {
+  		
+        printf("\nTotal final de horas extras: %dh\n", totalHoras);
 
         arquivo = fopen("relatorio_horas.txt", "w"); 
-        fclose(arquivo);
+		system("pause");
+	}
 
-        printf("Relatorio limpo com sucesso!\n");
-    }
 }
+
+//__________________________________
+
 
 int main() {
     int resposta, respostagestor, entradafuncionario, saidafuncionario, acumulohorasextras;
@@ -155,7 +171,7 @@ int main() {
                     } 
                     else if (respostagestor == 2) {
                         printf("Horas extras negadas!\n");
-                        registrarHoras(0, 0, 0, 1);  // registra o pedido negado
+                        registrarHoras(0, 0, 0, 1);
                         system("pause");
                     } 
                     else {
@@ -170,7 +186,6 @@ int main() {
             case 2:
                 system("cls");
                 visualizarRelatorio();
-                system("pause");
                 break;
 
             case 3:
