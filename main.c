@@ -6,6 +6,7 @@
 //______________________
 
 
+
 //______CABEÇALHO DE FUNÇÕES________<
 
 // Calcular horas extras.
@@ -16,6 +17,12 @@ int acumularhorasfuncao(int a, int b)
     
     if (horasextrascalculo > 8) {
     horasextrascalculo -= 8;
+    	{
+    		if (horasextrascalculo > 2)
+    		{
+    			horasextrascalculo = 2;
+			}
+		}
 	}
     else {
         horasextrascalculo = 0;
@@ -39,8 +46,8 @@ void registrarHoras(int entrada, int saida, int horasextras, int negado) {
     }
 
     fprintf(arquivo, "-------------------------------------\n");
-    fprintf(arquivo, "Data: %02d/%02d/%04d\n", infoTempo->tm_mday, infoTempo->tm_mon + 1, infoTempo->tm_year + 1900);
-    fprintf(arquivo, "Hora do registro: %02d:%02d:%02d\n", infoTempo->tm_hour, infoTempo->tm_min, infoTempo->tm_sec);
+    fprintf(arquivo, "Data: %02d/%02d/%04d  |  Hora do registro: %02d:%02d:%02d\n", 
+					infoTempo->tm_mday, infoTempo->tm_mon + 1, infoTempo->tm_year + 1900, infoTempo->tm_hour, infoTempo->tm_min, infoTempo->tm_sec);
 
     if (negado) {
         fprintf(arquivo, "Status: Hora extra NEGADA pelo gestor.\n");
@@ -98,7 +105,7 @@ void visualizarRelatorio() {
     char linha[200];
     int totalHoras = somarHorasExtras();
     int qtdRegistros = contarRegistros();
-    int opcaoRelatorio;
+    int opcaoRelatorio, valorareceber;
 
     arquivo = fopen("relatorio_horas.txt", "r");
     if (arquivo == NULL) {
@@ -115,17 +122,22 @@ void visualizarRelatorio() {
     }
     fclose(arquivo);
 
-    printf("Total de registros (aprovados e negados): %d\n", qtdRegistros);
-    printf("Total de horas extras acumuladas: %dh\n", totalHoras);
-    printf("\n=====================================\n");
+	printf("\n======================================\n");
+    printf("Registros: %d\n", qtdRegistros);
+    printf("Horas extras acumuladas: %d\n", totalHoras);
+    printf("=====================================\n");
 
     // Menu interno do relatório
     printf("\n(1) Voltar ao menu principal\n(2) Fechar relatorio\n-> ");
     scanf("%d", &opcaoRelatorio);
+    valorareceber = totalHoras * 80;
 
     if (opcaoRelatorio == 2) {
-  		
-        printf("\nTotal final de horas extras: %dh\n", totalHoras);
+  		system("cls");
+  		printf("\n====== FECHAMENTO DE HORAS EXTRAS =======\n");
+        printf("\nTotal final de horas extras: %d\n", totalHoras);    
+        printf("Valor acumulado em horas extras: R$%d\n", valorareceber); 
+        printf("\n=========================================\n");
 
         arquivo = fopen("relatorio_horas.txt", "w"); 
 		system("pause");
@@ -142,7 +154,7 @@ int main() {
     do {
         system("cls");
         printf("<===== REGISTRO DE HORAS EXTRAS ====>\n");
-        printf("(1) Solicitar hora extra\n(2) Relatorio\n(3) Controle de Horas\n(4) Sair\n-> ");
+        printf("(1) Solicitar hora extra\n(2) Relatorio\n(3) Avisos\n(4) Sair\n-> ");
         scanf("%d", &resposta);
 
         switch (resposta) {
@@ -163,10 +175,9 @@ int main() {
                         acumulohorasextras = acumularhorasfuncao(entradafuncionario, saidafuncionario);
 
                         printf("\nHoras extras registradas: %dh\n", acumulohorasextras);
-
+                        
                         registrarHoras(entradafuncionario, saidafuncionario, acumulohorasextras, 0);
 
-                        printf("Registro salvo com sucesso no arquivo relatorio_horas.txt!\n\n");
                         system("pause");
                     } 
                     else if (respostagestor == 2) {
@@ -183,24 +194,28 @@ int main() {
                 } while (respostagestor != 1 && respostagestor != 2);
                 break;
 
+
             case 2:
                 system("cls");
                 visualizarRelatorio();
                 break;
 
-            case 3:
-                system("cls");
-                printf("Funcionalidade de controle ainda em desenvolvimento.\n");
-                system("pause");
-                break;
+			
+			case 3:
+				
+				
+			break;
+
 
             case 4:
                 printf("Programa finalizado.\n");
                 exit(EXIT_SUCCESS);
                 break;
+                
+            
 
             default:
-                printf("Opcao invalida! Tente novamente.\n");
+                printf("Escolha uma das opcoes.\n");
                 system("pause");
                 break;
         }
