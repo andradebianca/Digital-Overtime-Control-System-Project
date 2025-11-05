@@ -3,5 +3,5 @@ PROJETO INTEGRADOR: Desenvolvimento de um sistema em C para registrar, calcular 
 
 ## INFORMAÇÕES ADICIONAIS: 
 -> O projeto deve ser executado em um compilador online para uma execução sem erros. Utilizamos o Replit para compilação, porém, como o replit não funciona a função "system("pause")" substituímos manualmente por getchar(); getchar();. <br>
--> O valor da hora extra é de R$80,00.
+-> O valor da hora extra é de R$80,00. <br>
 -> O Máximo de cadastros possíveis são 100 funcionários.
